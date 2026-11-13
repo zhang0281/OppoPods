@@ -3,6 +3,7 @@ package moe.chenxy.oppopods.config
 import android.content.SharedPreferences
 import android.util.Log
 import io.github.libxposed.service.XposedService
+import java.util.HashSet
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -178,14 +179,17 @@ object ConfigManager {
             .putString(PREF_KEY_FAKE_DEVICE_ID, config.fakeDeviceId)
             .putInt(PREF_KEY_LOG_LEVEL, config.logLevel)
             .putInt(PREF_KEY_ISLAND_MODE, config.islandMode)
-            .putStringSet(PREF_KEY_ISLAND_SHOW_TIMINGS, config.islandShowTimings.map { it.toString() }.toSet())
+            .putStringSet(PREF_KEY_ISLAND_SHOW_TIMINGS, remoteStringSet(config.islandShowTimings))
             .putInt(PREF_KEY_NOTIFICATION_CLICK_ACTION, config.notificationClickAction)
             .putInt(PREF_KEY_MORE_CLICK_ACTION, config.moreClickAction)
-            .putStringSet(PREF_KEY_MILINK_CARD_FEATURES, config.milinkCardFeatures.map(Int::toString).toSet())
+            .putStringSet(PREF_KEY_MILINK_CARD_FEATURES, remoteStringSet(config.milinkCardFeatures))
             .putBoolean(PREF_KEY_AUTO_GAME_MODE, config.autoGameMode)
             .putBoolean(PREF_KEY_FOCUS_NOTIFICATION, config.focusNotification)
             .commit()
     }
+
+    internal fun remoteStringSet(values: Set<Int>): HashSet<String> =
+        HashSet<String>(values.size).apply { values.forEach { add(it.toString()) } }
 
     private fun readConfig(prefs: SharedPreferences, source: String): AppConfig {
         val directFakeDeviceId = prefs.getString(PREF_KEY_FAKE_DEVICE_ID, null)
